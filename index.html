@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowChat</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GlowChat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
 </head>
-<body class="bg-gray-900 text-white flex h-screen">
-    <!-- Sidebar, Chat Area, Profile Modal (as per your provided code) -->
-    <script>
-        const socket = io('https://glowchatoffical.netlify.app'); // Update with Netlify server URL
-        // ... (rest of the JavaScript as provided earlier)
-    </script>
+<body class="bg-gray-900 text-white flex flex-col h-screen">
+
+  <!-- Chat messages -->
+  <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+
+  <!-- Input area -->
+  <form id="chat-form" class="flex p-4 border-t border-gray-700">
+    <input
+      id="message-input"
+      type="text"
+      placeholder="Type a message..."
+      class="flex-1 p-2 rounded bg-gray-800 text-white border border-gray-700"
+      autocomplete="off"
+      required
+    />
+    <button type="submit" class="ml-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded">Send</button>
+  </form>
+
+  <script>
+    const socket = io('https://glowchatoffical.netlify.app'); // Make sure your server supports WebSocket on Netlify (it usually doesn't natively)
+
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('message-input');
+    const messages = document.getElementById('messages');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const message = input.value;
+      socket.emit('chat message', message);
+      input.value = '';
+    });
+
+    socket.on('chat message', (msg) => {
+      const div = document.createElement('div');
+      div.textContent = msg;
+      div.className = 'bg-gray-800 p-2 rounded';
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
 </body>
 </html>
